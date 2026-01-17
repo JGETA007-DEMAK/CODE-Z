@@ -1,336 +1,201 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>Slow Code Buster</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+<me<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SEMS | Smart Equipment Management System</title>
 <style>
 :root{
-  --bg:#0b0f1a;
-  --panel:#11162a;
-  --accent:#4da3ff;
-  --good:#4dff88;
-  --bad:#ff5c5c;
+  /* === High Readability Engineering Dark Theme === */
+  --bg:#0f172a;          /* น้ำเงินเข้ม อ่านสบาย */
+  --card:#1e293b;        /* การ์ดแยกชัด */
+  --primary:#38bdf8;     /* ฟ้าเทคโนโลยี */
+  --accent:#22d3ee;      /* ฟ้าเน้น */
+  --warn:#fbbf24;        /* เหลืองเตือน */
+  --danger:#fb7185;      /* แดงเตือน */
+  --text:#f1f5f9;        /* ขาว อ่านง่าย */
+  --muted:#94a3b8;       /* เทาอ่อน */
 }
-*{box-sizing:border-box}
+
 body{
   margin:0;
-  font-family:'JetBrains Mono',monospace;
-  background:radial-gradient(circle at top,var(--panel),var(--bg));
-  color:#e6e9f0;
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
-section{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
-#game,#result{display:none}
 
-h1{
-  font-size:3.2rem;
-  margin:0;
-  background:linear-gradient(90deg,#4da3ff,#8affc1);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+.container{max-width:1200px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+h1{margin:0;font-size:1.9rem;color:#e0f2fe}
+.badge{background:var(--primary);color:#020617;padding:6px 14px;border-radius:999px;font-size:.85rem;font-weight:700}
+
+/* summary */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.summary-card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 8px 20px rgba(0,0,0,.25);text-align:center}
+.summary-card h2{margin:0;font-size:2.1rem;color:var(--primary)}
+.summary-card span{color:var(--muted)}
+
+.grid{display:grid;grid-template-columns:1fr 2fr;gap:24px}
+.card{background:var(--card);border-radius:16px;padding:1.5rem;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+.card h3{margin-top:0;color:#e0f2fe}
+
+/* form */
+input{
+  width:100%;
+  background:#020617;
+  color:var(--text);
+  border:1px solid #334155;
+  border-radius:10px;
+  padding:.65rem 1rem;
+  margin-bottom:10px;
 }
+input::placeholder{color:var(--muted)}
 
 button{
+  background:var(--primary);
+  color:#020617;
+  border:none;
+  border-radius:10px;
+  padding:.65rem 1.3rem;
+  font-weight:700;
   cursor:pointer;
-  transition:.3s ease;
 }
+button:hover{filter:brightness(1.1)}
+.danger{background:var(--danger);color:#020617}
 
-/* ---------- BUTTONS ---------- */
-button.start{
-  padding:1.5rem 3.5rem;
-  font-size:1.6rem;
-  font-weight:bold;
-  border:none;
-  border-radius:16px;
-  background:linear-gradient(135deg,#4da3ff,#6b7cff);
-  color:#fff;
-  box-shadow:0 12px 35px rgba(77,163,255,.5);
-}
-button.start:hover{
-  transform:translateY(-3px);
-  box-shadow:0 16px 50px rgba(77,163,255,.7);
-}
+/* table */
+table{width:100%;border-collapse:collapse;margin-top:12px;background:#020617}
+th{padding:10px;background:#020617;color:#7dd3fc;font-weight:700;border-bottom:1px solid #334155}
+td{padding:10px;text-align:center;color:var(--text)}
+tr:nth-child(even){background:#020617}
+tr:nth-child(odd){background:#020617cc}
 
-.nav-buttons{
-  width:90%;
-  max-width:1100px;
-  display:flex;
-  justify-content:space-between;
-  margin-top:1rem;
-}
-.nav-buttons .btn{
-  padding:1.2rem 3rem;
-  font-size:1.4rem;
-  font-weight:bold;
-  border:none;
-  border-radius:16px;
-  background:linear-gradient(135deg,#4da3ff,#6b7cff);
-  color:#fff;
-  box-shadow:0 12px 35px rgba(77,163,255,.5);
-}
-.nav-buttons .btn:hover{
-  transform:translateY(-3px);
-  box-shadow:0 16px 50px rgba(77,163,255,.7);
-}
+.ok{color:var(--accent);font-weight:700}
+.warn{color:var(--warn);font-weight:700}
+.bad{color:var(--danger);font-weight:700}
 
-/* ---------- HUD ---------- */
-.hud{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:1rem;
-  width:90%;
-  max-width:1100px;
-  margin-bottom:1rem;
-}
-.hud div{
-  background:rgba(255,255,255,.05);
-  padding:1rem;
-  border-radius:14px;
-  text-align:center;
-}
-.hud span{font-size:1.8rem;font-weight:bold}
-
-/* ---------- CODE BOX ---------- */
-#codeBox{
-  width:90%;
-  max-width:1100px;
-  background:#05070f;
-  border-radius:16px;
-  padding:2rem;
-  font-size:1.4rem;
-  line-height:1.8;
-  min-height:300px;
-}
-
-.char{opacity:.35}
-.char.correct{color:var(--good);opacity:1}
-.char.wrong{color:var(--bad);opacity:1}
-.char.active{
-  background:rgba(77,163,255,.25);
-  border-bottom:3px solid var(--accent);
-  opacity:1;
-}
-
-/* ---------- INPUT ---------- */
-#input{
-  margin-top:1.2rem;
-  width:90%;
-  max-width:1100px;
-  padding:1.2rem;
-  font-size:1.3rem;
-  border-radius:14px;
-  border:2px solid rgba(255,255,255,.1);
-  background:#0c1022;
-  color:white;
-}
-#input:focus{outline:none;border-color:var(--accent)}
+footer{text-align:center;margin-top:30px;color:var(--muted);font-size:.8rem}
 </style>
 </head>
-
 <body>
+<div class="container">
+<header>
+  <h1>Smart Equipment Management System</h1>
+  
+</header>
 
-<!-- GATE -->
-<section id="gate">
-  <h1>Slow Code Buster</h1>
-  <p>เริ่มจากง่าย → ไต่ระดับวิศวกรรม</p>
-  <button class="start" onclick="start()">START</button>
-</section>
+<div class="summary">
+  <div class="summary-card"><h2 id="total">0</h2><span>อุปกรณ์ทั้งหมด</span></div>
+  <div class="summary-card"><h2 id="riskHigh">0</h2><span>อุปกรณ์เสี่ยงสูง</span></div>
+  <div class="summary-card"><h2 id="riskMid">0</h2><span>ควรตรวจสอบ</span></div>
+  <div class="summary-card"><h2 id="avgRisk">0</h2><span>ค่า Risk เฉลี่ย</span></div>
+</div>
+  <div class="summary-card"><h2 id="riskHigh">0</h2><span>อุปกรณ์เสี่ยงสูง</span></div>
+  <div class="summary-card"><h2 id="riskMid">0</h2><span>ควรตรวจสอบ</span></div>
+</div>
 
-<!-- GAME -->
-<section id="game">
-  <div class="hud">
-    <div>LEVEL<span id="level">1</span></div>
-    <div>TIME<span id="time">0</span></div>
-    <div>CORRECT<span id="correct">0</span></div>
-    <div>WRONG<span id="wrong">0</span></div>
-    <div>SCORE<span id="score">0</span></div>
+<div class="grid">
+  <div class="card">
+    <h3>เพิ่มข้อมูลอุปกรณ์</h3>
+    <input id="name" placeholder="ชื่ออุปกรณ์" />
+    <input id="type" placeholder="ประเภทอุปกรณ์" />
+    <input id="power" type="number" placeholder="กำลังไฟ (W)" />
+    <input id="hours" type="number" placeholder="ชั่วโมงใช้งาน" />
+    <input id="fail" type="number" placeholder="จำนวนครั้งที่เสีย" />
+    <button class="primary" onclick="add()">บันทึก</button>
   </div>
 
-  <div id="codeBox"></div>
-  <input id="input" placeholder="พิมพ์ทีละตัวอักษร" autocomplete="off">
-
-  <div class="nav-buttons">
-    <button class="btn back" onclick="goBack()">⬅ Back</button>
-    <button class="btn next" onclick="nextLevel()">Next ➡</button>
+  <div class="card">
+    <h3>รายการอุปกรณ์ (เรียงตามความเสี่ยง)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ชื่อ</th>
+          <th>ประเภท</th>
+          <th>กำลังไฟ (W)</th>
+          <th>ชั่วโมง</th>
+          <th>เสีย</th>
+          <th>Risk</th>
+          <th>สถานะ</th>
+          <th>คาดการณ์</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
   </div>
-</section>
+</div>
 
-<!-- RESULT -->
-<section id="result">
-  <h1 id="rank"></h1>
-  <div class="nav-buttons">
-    <button class="btn next" onclick="nextLevel()">NEXT ➡</button>
-  </div>
-</section>
+<footer>Designed for Computer Engineering Portfolio (KMITL)</footer>
+</div>
 
 <script>
-/* ---------- DATA ---------- */
-const levels=[
-`let x = 10;
-console.log(x);`,
+let data = JSON.parse(localStorage.getItem('sems')) || [];
 
-`for(let i=0;i<3;i++){
-  console.log(i);
-}`,
+function risk(e){
+  return e.hours*0.4 + e.fail*0.4 + (e.power/1000)*0.2;
+}
 
-`function add(a,b){
-  return a + b;
-}`,
+function predict(e){
+  const score = risk(e);
+  if(score > 70) return 'ควรเปลี่ยนเร็วๆ นี้';
+  if(score > 40) return 'ควรวางแผนบำรุงรักษา';
+  return 'ยังใช้งานได้ปกติ';
+}
+function status(score){
+  if(score>60) return '<span class="bad">เสี่ยงสูง</span>';
+  if(score>30) return '<span class="warn">ควรตรวจสอบ</span>';
+  return '<span class="ok">ปกติ</span>';
+}
+function add(){
+  const e={name:name.value,type:type.value,power:+power.value,hours:+hours.value,fail:+fail.value};
+  if(!e.name||!e.type) return alert('กรอกข้อมูลให้ครบ');
+  data.push(e); localStorage.setItem('sems',JSON.stringify(data)); render();
+  name.value=type.value=power.value=hours.value=fail.value='';
+}
+function removeItem(i){data.splice(i,1);localStorage.setItem('sems',JSON.stringify(data));render()}
+function render(){
+  list.innerHTML='';
+  let hi=0,mid=0,totalRisk=0;
 
-`function factorial(n){
-  if(n===1) return 1;
-  return n * factorial(n-1);
-}`,
+  const sorted = [...data].sort((a,b)=>risk(b)-risk(a));
 
-`function binarySearch(arr,target){
-  let left=0,right=arr.length-1;
-  while(left<=right){
-    let mid=Math.floor((left+right)/2);
-    if(arr[mid]===target) return mid;
-    if(arr[mid]<target) left=mid+1;
-    else right=mid-1;
-  }
-  return -1;
-}`
-];
+  sorted.forEach((e,i)=>{
+    const r = risk(e);
+    totalRisk += r;
+    if(r>60) hi++; else if(r>30) mid++;
 
-let levelIndex=0;
-let charIndex=0;
-let correct=0, wrong=0, score=0;
-let finished=false;
-let time=0;
-let timer=null;
-
-/* ---------- ELEMENTS ---------- */
-const gate=document.getElementById("gate");
-const game=document.getElementById("game");
-const result=document.getElementById("result");
-const box=document.getElementById("codeBox");
-const input=document.getElementById("input");
-
-const levelEl=document.getElementById("level");
-const correctEl=document.getElementById("correct");
-const wrongEl=document.getElementById("wrong");
-const scoreEl=document.getElementById("score");
-const rankEl=document.getElementById("rank");
-const timeEl=document.getElementById("time");
-
-/* ---------- FUNCTIONS ---------- */
-function loadCode(){
-  box.innerHTML="";
-  charIndex=0;
-  finished=false;
-  correct=wrong=score=0;
-  correctEl.textContent=0;
-  wrongEl.textContent=0;
-  scoreEl.textContent=0;
-
-  [...levels[levelIndex]].forEach((c,i)=>{
-    const span=document.createElement("span");
-    span.textContent=c;
-    span.className="char"+(i===0?" active":"");
-    box.appendChild(span);
+    list.innerHTML += `
+      <tr>
+        <td>${e.name}</td>
+        <td>${e.type}</td>
+        <td>${e.power}</td>
+        <td>${e.hours}</td>
+        <td>${e.fail}</td>
+        <td>${r.toFixed(1)}</td>
+        <td>${status(r)}</td>
+        <td>${predict(e)}</td>
+        <td><button class="danger" onclick="removeItem(${data.indexOf(e)})">ลบ</button></td>
+      </tr>`;
   });
 
-  startTimer();
+  total.innerText = data.length;
+  riskHigh.innerText = hi;
+  riskMid.innerText = mid;
+  avgRisk.innerText = data.length ? (totalRisk/data.length).toFixed(1) : 0;
+}</td><td>${e.type}</td><td>${e.power}</td><td>${e.hours}</td><td>${e.fail}</td>
+      <td>${r.toFixed(1)}</td><td>${status(r)}</td>
+      <td><button class="danger" onclick="removeItem(${i})">ลบ</button></td>
+    </tr>`;
+  });
+  total.innerText=data.length; riskHigh.innerText=hi; riskMid.innerText=mid;
 }
-
-function startTimer(){
-  clearInterval(timer);
-  time=0;
-  timeEl.textContent=0;
-  timer=setInterval(()=>{
-    time++;
-    timeEl.textContent=time;
-  },1000);
-}
-
-function stopTimer(){
-  clearInterval(timer);
-}
-
-function start(){
-  gate.style.display="none";
-  game.style.display="flex";
-  loadCode();
-}
-
-input.addEventListener("keydown",e=>{
-  if(finished) return;
-  if(e.key.length!==1) return;
-  e.preventDefault();
-
-  const chars=document.querySelectorAll(".char");
-  const expected=levels[levelIndex][charIndex];
-
-  if(e.key===expected){
-    chars[charIndex].classList.add("correct");
-    correct++; score+=5;
-  }else{
-    chars[charIndex].classList.add("wrong");
-    wrong++; score-=2;
-  }
-
-  chars[charIndex].classList.remove("active");
-  charIndex++;
-
-  if(chars[charIndex]){
-    chars[charIndex].classList.add("active");
-  }else{
-    finish();
-  }
-
-  correctEl.textContent=correct;
-  wrongEl.textContent=wrong;
-  scoreEl.textContent=score;
-});
-
-function finish(){
-  finished=true;
-  stopTimer();
-  game.style.display="none";
-  result.style.display="flex";
-
-  if(score<20) rankEl.textContent="🚶 เดิน";
-  else if(score<50) rankEl.textContent="🚴 ปั่นจักรยาน";
-  else if(score<80) rankEl.textContent="🚗 ขี่รถ";
-  else if(score<120) rankEl.textContent="✈️ เครื่องบิน";
-  else rankEl.textContent="🚀 จรวด";
-}
-
-function nextLevel(){
-  levelIndex=Math.min(levelIndex+1,levels.length-1);
-  levelEl.textContent=levelIndex+1;
-  input.value="";
-  result.style.display="none";
-  game.style.display="flex";
-  loadCode();
-}
-
-function goBack(){
-  if(levelIndex===0) return;
-  levelIndex--;
-  levelEl.textContent=levelIndex+1;
-  input.value="";
-  loadCode();
-}
+render();
 </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
 
 
